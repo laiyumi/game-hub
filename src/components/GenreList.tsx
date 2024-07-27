@@ -17,13 +17,13 @@ interface onSlectedGenreProps {
 }
 
 const GenreList = ({ onSelectGenre, selectedGenre }: onSlectedGenreProps) => {
-  const { data, loading, error } = useGenres();
+  const { data, isLoading, error } = useGenres();
 
   if (error) {
     return null;
   }
 
-  if (loading) {
+  if (isLoading) {
     return <Spinner />;
   }
 
@@ -33,7 +33,7 @@ const GenreList = ({ onSelectGenre, selectedGenre }: onSlectedGenreProps) => {
         <Heading fontSize="xl" marginTop={5} marginBottom={5}>
           Genres
         </Heading>
-        {data.map((genre) => (
+        {data?.results.map((genre) => (
           <ListItem key={genre.id} paddingY="5px">
             <HStack>
               <Image
