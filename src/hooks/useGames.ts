@@ -1,6 +1,6 @@
 // Custom hook to fetch games with filters from the API
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { GameQuery } from "../App";
 import APIClient from "../services/api-client";
 import { FetchResponse } from "../services/api-client";
@@ -19,17 +19,22 @@ export interface Game {
 const apiClient = new APIClient<Game>("/games");
 
 const useGames = (gameQuery: GameQuery) =>
-  useQuery<FetchResponse<Game>, Error>({
+  useInfiniteQuery<FetchResponse<Game>, Error>({
     queryKey: ["games", gameQuery],
-    queryFn: () =>
+    queryFn: ({ pageParam = 1 }) =>
       apiClient.getAll({
         params: {
           genres: gameQuery.genre?.id,
           parent_platforms: gameQuery.platform?.id,
           ordering: gameQuery.sortOrder,
           search: gameQuery.searchText,
+          page: pageParam,
         },
       }),
+    getNextPageParam: (lastPage, allPages) => {
+      // check if there is a next page, otherwise return undefined
+      return lastPage.next ? allPages.length + 1 : undefined;
+    },
   });
 
 export default useGames;
